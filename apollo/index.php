@@ -1,23 +1,19 @@
-<!DOCTYPE html>
-<html>
-<style>
-table, th, td {
-  border:1px solid black;
-}
-</style>
-<body>
-<h1>Posições iCarros (Apollo)</h1>
-
 <?php 
-
+//CONFIGS
+$keyword = "Acesse o valor";
+$nomeLoja = "APOLLO";
+$linksCSV = "icarros.csv";
 set_time_limit(1000);
 
-function print_obj($obj = null){
-	echo "<pre>";
-	print_r($obj);
-	echo "</pre>";
-}
+// CONVERTE CSV EM ARRAY
+$csv = array_map("str_getcsv", file($linksCSV)); 
+$header = array_shift($csv); 
 
+// CAPTURA SOMENTE A PRIMEIRA FILEIRA DO CSV
+$col = array_search("Value", $header, true); 
+foreach ($csv as $row) {      
+	$urlsVeiculos[] = $row[$col]; 
+}
 
 function getValue($status=null){
 	if(is_null($status))
@@ -30,10 +26,10 @@ function getValue($status=null){
 	}
 }
 
-function PuxarValor($url=null,$id=null){
+function PuxarInformacoes($url=null,$id=null){
+	global $keyword, $nomeLoja;
 
-
-	//INICIA O CURL
+	// INICIA O CURL
 	$ua = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/525.13 (KHTML, like Gecko) Chrome/0.A.B.C Safari/525.13';
 	$ch = curl_init();
 	curl_setopt($ch,CURLOPT_URL, $url);
@@ -59,123 +55,111 @@ function PuxarValor($url=null,$id=null){
 	libxml_clear_errors();
 	$xpath=new DOMXPath($thispage);
 
-        $posAnuncioSearch = 1;
-        while ( $posAnuncioSearch <= 20) {
+    $posAnuncioSearch = 1;
+    while ($posAnuncioSearch <= 20) {
+    	$status=$xpath->query("//*[@class='clearfix anuncios']/form[1]/ul[1]/li[".$posAnuncioSearch."]");
+    	$infoAnuncio = getValue($status);
 
-        	$status=$xpath->query("//*[@class='clearfix anuncios']/form[1]/ul[1]/li[".$posAnuncioSearch."]");
-        	$resultado = getValue($status);
+    		if ($posAnuncioSearch == 1) {
+    			$valorVeiculoPrimeiro = substr(
+											$infoAnuncio, 
+											(strpos($infoAnuncio,"R$")+3),
+											((strpos($infoAnuncio,"preço à vista"))-(strpos($infoAnuncio,"R$")+3))
+										);
+    		}
 
-        		if(strpos($resultado, "Acesse o valor") == false){
-			    $posAnuncio = "not found";
-			    $valorVeiculoLoja = "not found";
-				} else{
+    		if(strpos($infoAnuncio, $keyword) == false){
+			   $posAnuncio = "X";
+			   $lojaVeiculo = "X";
+			   $classificacaoAnuncio = 3;
+			} else{
 			    $posAnuncio = $posAnuncioSearch;
 
-			    $status=$xpath->query("//*[@class='clearfix anuncios']/form[1]/ul[1]/li[".$posAnuncioSearch."]");
-				$resultado = getValue($status);
+				$nomeVeiculo = substr($infoAnuncio, 0, strpos($infoAnuncio,"R$"));
+				$anoVeiculo = substr(
+									$infoAnuncio, 
+									(strpos($infoAnuncio,"Ano")+3),
+									((strpos($infoAnuncio,"Km"))-(strpos($infoAnuncio,"Ano")+3))
+								);
+				$valorVeiculoLoja = substr(
+									$infoAnuncio, 
+									(strpos($infoAnuncio,"R$")+3),
+									((strpos($infoAnuncio,"preço à vista"))-(strpos($infoAnuncio,"R$")+3))
+								);
+				$lojaVeiculo = "$nomeLoja";
 
-				$resultadoarray = explode("R$", $resultado);
-		        $nomeVeiculo = $resultadoarray[0];
-
-
-		        $resultadoarray = explode("preço à vista", $resultadoarray[1]);
-		        $valorVeiculoLoja = $resultadoarray[0];
-
-        		$posAnuncioSearch = 21;
+				switch ($posAnuncioSearch){
+				    case 1:
+				        $classificacaoAnuncio = 1;
+				        break;
+				    case 2:
+				    case 3:
+				        $classificacaoAnuncio = 2;
+				        break;
+				    default:
+				        $classificacaoAnuncio = 3;
+				        break;
 				}
-
-			$posAnuncioSearch++;
-	    }
-	        	
-
-	        $status=$xpath->query("//*[@class='clearfix anuncios']/form[1]/ul[1]/li[1]");
-	        $resultado = getValue($status);
-
-
-	        if(strpos($resultado, "Km") !== false){
-			
-		        $resultadoarray = explode("R$", $resultado);
-		        $nomeVeiculo = $resultadoarray[0];
-
-
-		        $resultadoarray = explode("preço à vista", $resultadoarray[1]);
-		        $valorVeiculo = $resultadoarray[0];
-
-		        $resultadoarray = explode("Km", $resultadoarray[1]);
-		        $anoVeiculo = $resultadoarray[0];
-
-		        $tablestyle = "";
-
-				if(strpos($resultadoarray[1], "Acesse o valor") !== false){
-				    $lojaVeiculo = "APOLLO";
-				    $tablestyle = "style='background-color:yellowgreen;color:white;'";
-				} else{
-				    $lojaVeiculo = "X";
-   				    $tablestyle = "style='background-color:tomato;color:white;'";
-
-				}
-
-				if ($posAnuncio == 2 OR $posAnuncio == 3) {
-					$tablestyle = "style='background-color:darkgoldenrod;color:white;'";
-				}
-
-			} else{
-				$id = "ERRO";
-				$nomeVeiculo = "ERRO";
-				$anoVeiculo = "ERRO";
-				$valorVeiculo = "ERRO";
-				$lojaVeiculo = "ERRO";
+        		break;
 			}
 
-	        echo "<tr ".$tablestyle.">
-	     		  	<td>".$id."</td>
-				    <td><a href='".$url."' target='_blank'>".$nomeVeiculo."</a></td>
-				    <td>".$anoVeiculo."</td>
-				    <td>".$valorVeiculo."</td>
-				    <td>".$valorVeiculoLoja."</td>
-				    <td>".$lojaVeiculo."</td>
-				    <td>".$posAnuncio."</td>
-				  </tr>";
+		$posAnuncioSearch++;
+    }
+	    
+    switch ($classificacaoAnuncio){
+	    case 1:
+	        $tablestyle = "style='background-color:yellowgreen;color:white;'";
+	        break;
+	    case 2:
+	        $tablestyle = "style='background-color:darkgoldenrod;color:white;'";
+	        break;
+	    case 3:
+	        $tablestyle = "style='background-color:tomato;color:white;'";
+	        break;
+	    default:
+	    	$tablestyle = "";
+	    	break;
+	}
+
+    echo "<tr ".$tablestyle.">
+ 		  	<td>".$id."</td>
+		    <td><a href='".$url."' target='_blank'>".$nomeVeiculo."</a></td>
+		    <td>".$anoVeiculo."</td>
+		    <td>".$valorVeiculoPrimeiro."</td>
+		    <td>".$valorVeiculoLoja."</td>
+		    <td>".$lojaVeiculo."</td>
+		    <td>".$posAnuncio."</td>
+		  </tr>";
 };
-
-
-$csv = array_map("str_getcsv", file("icarros.csv")); 
-$header = array_shift($csv); 
-// Seperate the header from data
-
-$col = array_search("Value", $header, true); 
- foreach ($csv as $row) {      
- $urlsVeiculos[] = $row[$col]; 
-}
-
-//print_r($urlsVeiculos);
-
-
-echo "<table style='width:100%''>
-  <tr>
- 	<th>ID</th>
-    <th>CARRO</th>
-    <th>ANO</th>
-    <th>VALOR 1º</th>
-    <th>VALOR LOJA</th>
-    <th>LOJA 1ª</th>
-    <th>POS LOJA</th>
-  </tr>";
-
-
-$i= 1;
-foreach($urlsVeiculos as $urlVeiculo){
-	//echo $i." - ".$urlVeiculo."</br>";
-	PuxarValor($urlVeiculo,$i);
-	$i++;
-
-	sleep(10);
-}
-
- echo "</table>";
-
-
 ?>
-
-</body>
+<!DOCTYPE html>
+<html>
+	<style>
+		table, th, td {
+		  border:1px solid black;
+		}
+	</style>
+	<body>
+		<h1>Posições iCarros (Apollo)</h1>
+		<table style='width:100%'>
+		  <tr>
+		 	<th>ID</th>
+		    <th>CARRO</th>
+		    <th>ANO</th>
+		    <th>VALOR 1º</th>
+		    <th>VALOR LOJA</th>
+		    <th>LOJA 1ª</th>
+		    <th>POS LOJA</th>
+		  </tr>
+			<?php 
+			$i= 1;
+			foreach($urlsVeiculos as $urlVeiculo){
+				//echo $i." - ".$urlVeiculo."</br>";
+				PuxarInformacoes($urlVeiculo,$i);
+				$i++;
+				sleep(10);
+			}
+			?>
+		</table>
+	</body>
 </html>
