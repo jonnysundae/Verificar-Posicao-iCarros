@@ -69,9 +69,16 @@ function PuxarInformacoes($url=null,$id=null){
     		}
 
     		if(strpos($infoAnuncio, $keyword) == false){
-			   $posAnuncio = "X";
-			   $lojaVeiculo = "X";
-			   $classificacaoAnuncio = 3;
+    			$nomeVeiculo = substr($infoAnuncio, 0, strpos($infoAnuncio,"R$"));
+				$anoVeiculo = substr(
+									$infoAnuncio, 
+									(strpos($infoAnuncio,"Ano")+3),
+									((strpos($infoAnuncio,"Km"))-(strpos($infoAnuncio,"Ano")+3))
+								);
+			  	$posAnuncio = "X";
+				$lojaVeiculo = "X";
+				$valorVeiculoLoja = "X";
+			   	$classificacaoAnuncio = 3;
 			} else{
 			    $posAnuncio = $posAnuncioSearch;
 
