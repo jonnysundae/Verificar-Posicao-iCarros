@@ -10,4 +10,4 @@ Um script em PHP que verifica a posição dos anúncios cadastrados na plataform
 ```
 https://www.icarros.com.br/ache/listaanuncios.jsp?bid=0&opcaocidade=1&foa=1&anunciosNovos=1&anunciosUsados=1&marca1=31&modelo1=919&anomodeloinicial=2014&anomodelofinal=2014&precominimo=0&precomaximo=0&cidadeaberto=&escopo=2&locationSop=cid_7043.1_-est_RJ.1_-esc_2.1_-rai_50.1_
 ```
-3. Inicie o index.php pelo servidor e deixe o script trabalhar! 😁
+3. Inicie o index.php pelo servidor e deixe o script trabalhar!
