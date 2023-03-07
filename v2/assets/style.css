@@ -1,0 +1,103 @@
+*{
+    font-family: 'Poppins', sans-serif;
+}
+
+.listaVeiculos{
+    width: 100vw;
+    max-width: 1366px;
+    background-color: #cccccc;
+}
+
+.listaVeiculos ul {
+    display: grid;
+    grid-template-columns: 45vw 45vw;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    justify-content: center;
+}
+
+.listaVeiculos li{
+    margin: 10px;
+}
+
+
+#veiculo{
+    display: flex;
+
+
+    width: 42vw;
+    min-height: 50px;
+    border-radius: 10px;
+    background-color: rgb(221, 221, 221);
+    border: 3px #ddd solid;
+}
+
+#fotoVeiculo{
+    background-size: cover;
+    background-position: center;
+    width: 155px;
+    min-height: 50px;
+    border-radius: 10px;
+}
+
+#idVeiculo{
+    width: fit-content;
+    padding: 3px;
+    border-bottom-right-radius: 10px;
+    background-color: #ddd;
+
+    font-weight: 600;
+}
+
+#detalhesVeiculo{
+    margin: 7px;
+    width: inherit;
+}
+
+#detalhesVeiculo div{
+    font-weight: 400;
+    font-size: 16px;
+}
+
+#detalhesVeiculo span{
+    font-weight: 600;
+    font-size: 12px;
+}
+
+#classficacaoLoja{
+    width: 250px;
+    background-color: red;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    margin-right: 2.5px;
+    padding: 5px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#classificacaoPrimeira{
+    width: 250px;
+    background-color: green;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 5px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#classificacaoPrimeira div, #classficacaoLoja div{
+    font-weight: 600;
+    font-size: 12px;
+}
+
+#classificacaoPrimeira span, #classficacaoLoja span{
+    font-weight: 400;
+    font-size: 16px; 
+}
